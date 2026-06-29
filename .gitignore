@@ -15,8 +15,8 @@
 # Esto permite que cada compañero trabaje en su versión si es necesario.
 
 # Infraestructura y DI
-app/src/main/java/com/example/agua2/AguaApplication.kt
-app/src/main/java/com/example/agua2/di/AppContainer.kt
+#app/src/main/java/com/example/agua2/AguaApplication.kt
+#app/src/main/java/com/example/agua2/di/AppContainer.kt
 app/src/main/java/com/example/agua2/di/AppViewModelProvider.kt
 app/src/main/java/com/example/agua2/navigation/AppNavigation.kt
 
