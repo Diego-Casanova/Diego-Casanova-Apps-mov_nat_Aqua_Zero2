@@ -1,9 +1,9 @@
 package com.example.agua2.di
 
+import com.example.agua2.data.repository.AguaRepository
 import com.example.agua2.data.repository.AuthRepository
+import com.example.agua2.data.repository.FakeAguaRepository
 import com.example.agua2.data.repository.FakeAuthRepository
-import com.example.agua2.data.repository.FakeWaterRepository
-import com.example.agua2.data.repository.WaterRepository
 
 /**
  * Contenedor de dependencias para la Inyección de Dependencias Manual.
@@ -12,7 +12,7 @@ import com.example.agua2.data.repository.WaterRepository
  */
 interface AppContainer {
     val authRepository: AuthRepository
-    val waterRepository: WaterRepository
+    val waterRepository: AguaRepository
 }
 
 /**
@@ -31,7 +31,7 @@ class AppDataContainer : AppContainer {
      * Implementación única del repositorio de agua.
      * Mantiene la consistencia de Fuente Única de Verdad (SSOT).
      */
-    override val waterRepository: WaterRepository by lazy {
-        FakeWaterRepository()
+    override val waterRepository: AguaRepository by lazy {
+        FakeAguaRepository()
     }
 }
