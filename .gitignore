@@ -1,0 +1,41 @@
+# --- ARCHIVOS DE SISTEMA E IDE ---
+.gradle
+/build
+/app/build
+/captures
+/local.properties
+.DS_Store
+*.iml
+.idea/
+.cxx
+.externalNativeBuild
+
+# --- ARCHIVOS ESPECÍFICOS DE LA REFACTORIZACIÓN (MAD) ---
+# Descomenta una línea para ignorar ese archivo en tus commits.
+# Esto permite que cada compañero trabaje en su versión si es necesario.
+
+# Infraestructura y DI
+app/src/main/java/com/example/agua2/AguaApplication.kt
+app/src/main/java/com/example/agua2/di/AppContainer.kt
+app/src/main/java/com/example/agua2/di/AppViewModelProvider.kt
+app/src/main/java/com/example/agua2/navigation/AppNavigation.kt
+
+# Capa de Datos (Repositories)
+app/src/main/java/com/example/agua2/data/repository/AuthRepository.kt
+app/src/main/java/com/example/agua2/data/repository/FakeAuthRepository.kt
+app/src/main/java/com/example/agua2/data/repository/WaterRepository.kt
+app/src/main/java/com/example/agua2/data/repository/FakeWaterRepository.kt
+
+# ViewModels
+app/src/main/java/com/example/agua2/ui/viewmodels/LoginViewModel.kt
+app/src/main/java/com/example/agua2/ui/viewmodels/RegisterViewModel.kt
+app/src/main/java/com/example/agua2/ui/viewmodels/DashboardViewModel.kt
+app/src/main/java/com/example/agua2/ui/viewmodels/ConsumptionViewModel.kt
+app/src/main/java/com/example/agua2/ui/viewmodels/StatsViewModel.kt
+
+# Pantallas Refactorizadas (Opcional ignorar)
+# app/src/main/java/com/example/agua2/ui/screens/LoginScreen.kt
+# app/src/main/java/com/example/agua2/ui/screens/RegisterScreen.kt
+# app/src/main/java/com/example/agua2/ui/screens/DashboardScreen.kt
+# app/src/main/java/com/example/agua2/ui/screens/ConsumptionScreen.kt
+# app/src/main/java/com/example/agua2/ui/screens/StatsScreen.kt
