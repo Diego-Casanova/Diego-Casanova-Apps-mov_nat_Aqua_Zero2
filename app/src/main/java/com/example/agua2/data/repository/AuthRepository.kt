@@ -15,4 +15,10 @@ interface AuthRepository {
 
     // Función suspendida para registro (simulada)
     suspend fun register(cedula: String, password: String): Boolean
+
+    // Cerrar sesión
+    suspend fun logout()
+
+    // Obtener la cédula del usuario actual como flujo reactivo
+    fun getCurrentUserCedula(): Flow<String?>
 }

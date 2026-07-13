@@ -41,4 +41,12 @@ class FakeAguaRepository : AguaRepository {
             )
         )
     }.flowOn(Dispatchers.IO)
+
+    override suspend fun insertConsumptionRecord(record: ConsumptionRecord) {
+        // No hace nada en la versión fake
+    }
+
+    override suspend fun deleteConsumptionRecord(id: Int) {
+        // No hace nada en la versión fake
+    }
 }

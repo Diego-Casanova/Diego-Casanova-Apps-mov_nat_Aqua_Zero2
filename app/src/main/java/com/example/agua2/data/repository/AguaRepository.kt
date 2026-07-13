@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 interface AguaRepository {
     fun getConsumptionHistory(): Flow<List<ConsumptionRecord>>
     fun getConsumptionSummary(): Flow<ConsumptionSummary>
+    suspend fun insertConsumptionRecord(record: ConsumptionRecord)
+    suspend fun deleteConsumptionRecord(id: Int)
 }
 
 data class ConsumptionSummary(

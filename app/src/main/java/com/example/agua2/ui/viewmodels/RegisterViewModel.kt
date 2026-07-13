@@ -29,7 +29,10 @@ class RegisterViewModel(
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
     fun onCedulaChanged(cedula: String) {
-        _uiState.update { it.copy(cedula = cedula, errorMessage = null) }
+        // Validación: Solo números y máximo 10 caracteres
+        if (cedula.all { it.isDigit() } && cedula.length <= 10) {
+            _uiState.update { it.copy(cedula = cedula, errorMessage = null) }
+        }
     }
 
     fun onPasswordChanged(password: String) {
@@ -46,9 +49,14 @@ class RegisterViewModel(
     fun register() {
         val currentState = _uiState.value
         
-        // Validaciones básicas de negocio
-        if (currentState.cedula.isBlank() || currentState.password.isBlank() || currentState.confirmPassword.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Todos los campos son obligatorios") }
+        // Validaciones de negocio
+        if (currentState.cedula.length != 10) {
+            _uiState.update { it.copy(errorMessage = "La cédula debe tener exactamente 10 dígitos") }
+            return
+        }
+
+        if (currentState.password.length < 6) {
+            _uiState.update { it.copy(errorMessage = "La contraseña debe tener al menos 6 caracteres") }
             return
         }
 

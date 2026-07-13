@@ -18,7 +18,7 @@ class AguaApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Inicializamos el contenedor de datos/dependencias
-        container = AppDataContainer()
+        // Inicializamos el contenedor de datos/dependencias pasando el contexto de la aplicación
+        container = AppDataContainer(this)
     }
 }

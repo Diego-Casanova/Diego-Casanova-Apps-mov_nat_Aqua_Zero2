@@ -15,8 +15,11 @@ class FakeAuthRepository : AuthRepository {
 
     // Fuente única de verdad para el estado de autenticación en memoria
     private val _isLoggedIn = MutableStateFlow(false)
+    private val _currentUserCedula = MutableStateFlow<String?>(null)
     
     override fun isUserLoggedIn(): Flow<Boolean> = _isLoggedIn.asStateFlow()
+
+    override fun getCurrentUserCedula(): Flow<String?> = _currentUserCedula.asStateFlow()
 
     /**
      * Simula un proceso de login con retardo asíncrono.
@@ -32,6 +35,7 @@ class FakeAuthRepository : AuthRepository {
             
             if (success) {
                 _isLoggedIn.value = true
+                _currentUserCedula.value = cedula
             }
             
             success
@@ -52,9 +56,22 @@ class FakeAuthRepository : AuthRepository {
             
             if (success) {
                 _isLoggedIn.value = true
+                _currentUserCedula.value = cedula
             }
             
             success
+        }
+    }
+
+    /**
+     * Simula un proceso de logout con retardo asíncrono.
+     */
+    override suspend fun logout() {
+        withContext(Dispatchers.IO) {
+            // Simulamos latencia
+            delay(500)
+            _isLoggedIn.value = false
+            _currentUserCedula.value = null
         }
     }
 }

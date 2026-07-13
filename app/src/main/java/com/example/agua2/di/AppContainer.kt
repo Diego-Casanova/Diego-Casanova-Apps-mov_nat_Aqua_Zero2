@@ -1,9 +1,11 @@
 package com.example.agua2.di
 
+import android.content.Context
+import com.example.agua2.data.local.AguaDatabase
 import com.example.agua2.data.repository.AguaRepository
 import com.example.agua2.data.repository.AuthRepository
-import com.example.agua2.data.repository.FakeAguaRepository
-import com.example.agua2.data.repository.FakeAuthRepository
+import com.example.agua2.data.repository.OfflineAguaRepository
+import com.example.agua2.data.repository.OfflineAuthRepository
 
 /**
  * Contenedor de dependencias para la Inyección de Dependencias Manual.
@@ -19,19 +21,23 @@ interface AppContainer {
  * Implementación real del contenedor que instancia los repositorios.
  * Aquí es donde se decide qué implementación concreta usar (Fake o Real).
  */
-class AppDataContainer : AppContainer {
+class AppDataContainer(private val context: Context) : AppContainer {
     /**
      * Implementación única del repositorio de autenticación.
      */
     override val authRepository: AuthRepository by lazy {
-        FakeAuthRepository()
+        OfflineAuthRepository(AguaDatabase.getDatabase(context).userDao())
     }
 
     /**
      * Implementación única del repositorio de agua.
      * Mantiene la consistencia de Fuente Única de Verdad (SSOT).
+     * Ahora utiliza OfflineAguaRepository conectado a Room y filtrado por usuario.
      */
     override val waterRepository: AguaRepository by lazy {
-        FakeAguaRepository()
+        OfflineAguaRepository(
+            AguaDatabase.getDatabase(context).consumptionDao(),
+            authRepository
+        )
     }
 }

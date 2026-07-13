@@ -1,14 +1,15 @@
 package com.example.agua2.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,10 +20,6 @@ import com.example.agua2.di.AppViewModelProvider
 import com.example.agua2.ui.viewmodels.DashboardUiState
 import com.example.agua2.ui.viewmodels.DashboardViewModel
 
-/**
- * Pantalla principal del Dashboard.
- * Aplica MAD Skills: Recolección segura de StateFlow y State Hoisting.
- */
 @Composable
 fun DashboardScreen(
     onLogout: () -> Unit,
@@ -34,25 +31,57 @@ fun DashboardScreen(
     DashboardContent(
         uiState = uiState,
         onLogout = onLogout,
-        onNavigateToConsumption = onNavigateToConsumption
+        onNavigateToConsumption = onNavigateToConsumption,
+        onAddConsumption = viewModel::addRandomConsumption,
+        onDeleteConsumption = viewModel::deleteConsumption
     )
 }
 
-/**
- * Contenido del Dashboard sin estado.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardContent(
     uiState: DashboardUiState,
     onLogout: () -> Unit,
-    onNavigateToConsumption: () -> Unit
+    onNavigateToConsumption: () -> Unit,
+    onAddConsumption: () -> Unit,
+    onDeleteConsumption: (Int) -> Unit
 ) {
+    // Estado para controlar el panel (diálogo) de eliminación
+    var recordToDelete by remember { mutableStateOf<ConsumptionRecord?>(null) }
+
+    // Diálogo de confirmación para borrar
+    if (recordToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { recordToDelete = null },
+            title = { Text("Eliminar Registro") },
+            text = { Text("¿Deseas eliminar este registro de ${recordToDelete?.amountLiters} litros del día ${recordToDelete?.date}?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteConsumption(recordToDelete!!.id)
+                        recordToDelete = null
+                    }
+                ) {
+                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { recordToDelete = null }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mi Consumo de Agua") },
+                title = { Text("Mi Consumo") },
                 actions = {
+                    // BOTÓN APARTE PARA AGREGAR
+                    IconButton(onClick = onAddConsumption) {
+                        Icon(Icons.Default.Add, contentDescription = "Añadir Consumo")
+                    }
                     IconButton(onClick = onLogout) {
                         Icon(Icons.Default.Logout, contentDescription = "Cerrar Sesión")
                     }
@@ -60,8 +89,9 @@ fun DashboardContent(
             )
         },
         floatingActionButton = {
+            // Botón que solo navega a detalles/gráficas
             FloatingActionButton(onClick = onNavigateToConsumption) {
-                Icon(Icons.Default.WaterDrop, contentDescription = "Ver Detalles")
+                Icon(Icons.Default.WaterDrop, contentDescription = "Ver Gráficas")
             }
         }
     ) { padding ->
@@ -74,6 +104,7 @@ fun DashboardContent(
             is DashboardUiState.Success -> {
                 ConsumptionList(
                     records = uiState.history,
+                    onRecordClick = { recordToDelete = it },
                     modifier = Modifier.padding(padding)
                 )
             }
@@ -89,36 +120,45 @@ fun DashboardContent(
 @Composable
 fun ConsumptionList(
     records: List<ConsumptionRecord>,
+    onRecordClick: (ConsumptionRecord) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(records) { record ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Row(
+    if (records.isEmpty()) {
+        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("No hay registros. Usa el botón '+' arriba para agregar uno.")
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(records) { record ->
+                Card(
                     modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .fillMaxWidth()
+                        .clickable { onRecordClick(record) }, // Al tocar, abre el panel de borrar
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Default.WaterDrop,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(text = "${record.amountLiters} Litros", style = MaterialTheme.typography.titleMedium)
-                            Text(text = record.date, style = MaterialTheme.typography.bodySmall)
+                    Row(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.WaterDrop,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(text = "${record.amountLiters} Litros", style = MaterialTheme.typography.titleMedium)
+                                Text(text = record.date, style = MaterialTheme.typography.bodySmall)
+                            }
                         }
                     }
                 }

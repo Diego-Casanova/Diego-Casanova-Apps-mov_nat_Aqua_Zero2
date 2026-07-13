@@ -35,7 +35,8 @@ object AppViewModelProvider {
         // Inicializador para el DashboardViewModel
         initializer {
             DashboardViewModel(
-                waterRepository = aguaApplication().container.waterRepository
+                waterRepository = aguaApplication().container.waterRepository,
+                authRepository = aguaApplication().container.authRepository
             )
         }
 

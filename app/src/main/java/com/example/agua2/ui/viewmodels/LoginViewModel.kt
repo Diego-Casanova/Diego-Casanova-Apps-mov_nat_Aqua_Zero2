@@ -32,10 +32,12 @@ class LoginViewModel(
 
     /**
      * Actualiza la cédula en el estado.
-     * Los eventos fluyen hacia arriba desde la UI al ViewModel.
+     * Validación: Solo números y máximo 10 dígitos.
      */
     fun onCedulaChanged(cedula: String) {
-        _uiState.update { it.copy(cedula = cedula, errorMessage = null) }
+        if (cedula.all { it.isDigit() } && cedula.length <= 10) {
+            _uiState.update { it.copy(cedula = cedula, errorMessage = null) }
+        }
     }
 
     /**
@@ -50,8 +52,14 @@ class LoginViewModel(
      */
     fun login() {
         val currentState = _uiState.value
-        if (currentState.cedula.isBlank() || currentState.password.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Por favor, complete todos los campos") }
+        
+        if (currentState.cedula.length != 10) {
+            _uiState.update { it.copy(errorMessage = "La cédula debe tener 10 dígitos") }
+            return
+        }
+
+        if (currentState.password.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Ingrese su contraseña") }
             return
         }
 
@@ -66,7 +74,7 @@ class LoginViewModel(
                 _uiState.update { 
                     it.copy(
                         isLoading = false, 
-                        errorMessage = "Credenciales incorrectas (Use 1234567890 / 1234)" 
+                        errorMessage = "Cédula o contraseña incorrectas"
                     ) 
                 }
             }

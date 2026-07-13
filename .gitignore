@@ -39,3 +39,7 @@ app/src/main/java/com/example/agua2/ui/viewmodels/StatsViewModel.kt
 # app/src/main/java/com/example/agua2/ui/screens/DashboardScreen.kt
 # app/src/main/java/com/example/agua2/ui/screens/ConsumptionScreen.kt
 # app/src/main/java/com/example/agua2/ui/screens/StatsScreen.kt
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore

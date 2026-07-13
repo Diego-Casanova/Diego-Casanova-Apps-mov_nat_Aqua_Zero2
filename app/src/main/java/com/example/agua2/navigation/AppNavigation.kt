@@ -1,22 +1,16 @@
 package com.example.agua2.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.agua2.ui.screens.ConsumptionScreen
-import com.example.agua2.ui.screens.AccessScreen
-import com.example.agua2.ui.screens.ConsumptionScreen
-import com.example.agua2.ui.screens.DashboardScreen
-import com.example.agua2.ui.screens.LoginScreen
-import com.example.agua2.ui.screens.RegisterScreen
-import com.example.agua2.ui.screens.SplashScreen
-import com.example.agua2.ui.screens.StatsScreen
+import com.example.agua2.di.AppViewModelProvider
+import com.example.agua2.ui.screens.*
+import com.example.agua2.ui.viewmodels.DashboardViewModel
 
 /**
  * Orquestador de navegación de la aplicación.
- * Define las rutas y asegura que los ViewModels se instancien correctamente
- * en el nivel de pantalla (Screen level).
  */
 @Composable
 fun AppNavigation() {
@@ -37,7 +31,7 @@ fun AppNavigation() {
             )
         }
 
-        // Pantalla de Selección (Login o Register)
+        // Pantalla de Selección (Inicio o Registro)
         composable("access") {
             AccessScreen(
                 onNavigateToLogin = { navController.navigate("login") },
@@ -48,7 +42,12 @@ fun AppNavigation() {
         // Pantalla de Login
         composable("login") {
             LoginScreen(
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { 
+                    // Intentamos volver atrás, si no hay historial vamos a access
+                    if (!navController.popBackStack()) {
+                        navController.navigate("access")
+                    }
+                },
                 onNavigateToDashboard = {
                     navController.navigate("dashboard") {
                         popUpTo("access") { inclusive = true }
@@ -60,7 +59,11 @@ fun AppNavigation() {
         // Pantalla de Registro
         composable("register") {
             RegisterScreen(
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { 
+                    if (!navController.popBackStack()) {
+                        navController.navigate("access")
+                    }
+                },
                 onNavigateToDashboard = {
                     navController.navigate("dashboard") {
                         popUpTo("access") { inclusive = true }
@@ -68,17 +71,20 @@ fun AppNavigation() {
                 }
             )
         }
-// ... rest of the composables
 
         // Pantalla Principal - Dashboard
         composable("dashboard") {
+            val dashboardViewModel: DashboardViewModel = viewModel(factory = AppViewModelProvider.Factory)
             DashboardScreen(
                 onLogout = {
-                    navController.navigate("login") {
+                    dashboardViewModel.logout()
+                    // Al cerrar sesión, limpiamos el historial y vamos a la pantalla de selección
+                    navController.navigate("access") {
                         popUpTo("dashboard") { inclusive = true }
                     }
                 },
-                onNavigateToConsumption = { navController.navigate("consumption") }
+                onNavigateToConsumption = { navController.navigate("consumption") },
+                viewModel = dashboardViewModel
             )
         }
 
